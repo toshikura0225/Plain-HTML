@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+
+<html>
+
+<head>
+
+	<meta http-equiv="content-language" content="ja">
+	<meta charset="UTF-8">
+	<title>
+		スマート家電
+	</title>
+
+	<script src="http://code.jquery.com/jquery.min.js"></script>
+	
+	<script type="text/javascript">
+	$(function () {
+
+		var rnd = Math.random();
+		
+		if(rnd < 0.3)
+		{
+			$('div').text("ウェディングケーキはこの世で最も危険な食べ物である。");
+		}
+		else if(rnd < 0.6)
+		{
+			$('div').text("人が踊る時は一緒に踊れ。");
+		}
+		else
+		{
+			$('div').text("笑って暮らすも一生、泣いて暮らすも一生");
+		}
+	});
+
+	</script>
+
+	<style type="text/css">
+	</style>
+</head>
+
+<body>
+<div></div>
+
+</body>
+
+</html>
