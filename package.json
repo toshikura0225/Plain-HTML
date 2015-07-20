@@ -1,0 +1,12 @@
+{
+  "name": "sampleApp",
+  "version": "0.0.1",
+  "dependencies": {
+      "express": "2.5.9",
+      "socket.io": "0.9.10"
+  },
+  "engines": {
+      "node": "0.8.9",
+      "npm": "1.1.61"
+  }
+}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>rasp</title>
+<script src="/socket.io/socket.io.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="./js/my_script.js"></script>
+<script type="text/javascript">
+	function received(tag, data)
+	{
+		$('div').prepend(data + '<br>');
+		
+			$.ajax({
+				type: 'POST',
+				url: data,
+
+				success: function(data, textStatus){
+				  //console.log(data);
+				},
+				error: function(xhr, textStatus, errorThrown){
+				  // エラー処理
+				  console.log(textStatus);
+				}
+			});
+	}
+</script>
+</head>
+<body>
+<button onclick="alert('何もしない')">send</button>
+<div></div>
+
+</body>
+</html>

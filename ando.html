@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+	<title>遠隔操作側ソース 150328</title>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="./js/my_script.js"></script>
+
+	<script type="text/javascript">
+		// 
+		function received(tag, data)
+		{
+			$('#idReceived').prepend(data + '<br>');
+		}
+		
+		// 引数に指定したPINをいったんHIGHにしてすぐにOFFする
+		function sendSignal(pinNumber)
+		{
+			var url = "http://127.0.0.1:8000/GPIO/" + pinNumber+ "/value/";
+			
+			send(url + "1");
+			
+			setTimeout( function() {  send(url + "0"); }, 3000);
+			
+		}
+	</script>
+	<style type="text/css">
+	body
+	{
+		margin: 7%;
+	}
+	
+	#idON
+	{
+		float: left;
+		font-size: x-large;
+		width: 45%;
+		height: 5em;
+	}
+	
+	#idSpace
+	{
+		float: left;
+		width: 10%;
+	}
+	
+	#idOFF
+	{
+		font-size: x-large;
+		float: left;
+		width:  45%;
+		height: 5em;
+	}
+	
+	#idReceived
+	{
+		clear: both;
+	}
+
+	</style>
+</head>
+<body>
+	<button id="idON" onclick="sendSignal(2)">ON</button>
+	<div id="idSpace">　</div>
+	<button id="idOFF" onclick="sendSignal(3)">OFF</button>
+	<div id="idReceived"></div>
+</body>
+</html>
