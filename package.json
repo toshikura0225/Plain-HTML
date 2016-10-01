@@ -1,0 +1,11 @@
+{
+  "name": "node_plain",
+  "version": "16.8.16",
+  "dependencies": 
+    "socket.io": "~1.4.8"
+  },
+  "engines": {
+    "node": "4.4.7",
+    "npm": "2.15.8"
+  }
+}
