@@ -1,4 +1,5 @@
 var serialport = require('serialport');
+var OriProtocol = require('./OriProtocol.js');
 
 var net = require('net');
 var HOST = '127.0.0.1';
@@ -59,6 +60,7 @@ serialport.list(function (err, ports) {
 		sp.on('data', function (recv) {
 			
 			console.log('serial to tcp:' + recv);
+			//console.log('serial to tcp');
 			
 			/*
 			// 受信データをファイルに書き出し
@@ -71,10 +73,20 @@ serialport.list(function (err, ports) {
 			});
 			*/
 			
-			// serial→tcp
-			sock.write(recv);			
+			
+			
+			oriPro.addRecvArray(recv);
 		});
 		
+		var oriPro = new OriProtocol(function(dataArray) {
+			console.log("data received");
+			//console.log(dataArray);
+			//console.log(dataArray);
+
+			// serial→tcp
+			//dataArray = [1,2,3];
+			sock.write(dataArray.join(''));		
+		});
 		
 	}).listen(PORT, HOST);
 
