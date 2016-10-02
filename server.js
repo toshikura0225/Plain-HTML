@@ -45,4 +45,20 @@ var app = http.createServer(function (req, res) {
 
 }).listen(process.env.PORT || 3000);	// サーバー内環境のポートまたは3000番で待受
 
+var io = require('socket.io').listen(app);
+io.sockets.on('connection', function(socket) {
+	// なぜか.htmlにアクセス時に'connection'イベントが発生する（原因不明）
+	console.log("socket.io connected.");
+
+	socket.on('path-through', function(data) {
+		console.log();
+		console.log("socket.io received 'path-through' event and '" + data + "' message from html");
+
+		// 受信データをHTMLへ送信
+		//socket.broadcast.emit('path-through', data);	// 送信元以外に応答
+		socket.emit('path-through', data);	// 送信者を含む全員に送信
+	});
+});
+
+
 console.log('Server running!');
