@@ -2,12 +2,12 @@ var serialport = require('serialport');
 var OriProtocol = require('./OriProtocol.js');
 
 var net = require('net');
-var HOST = '127.0.0.1';
+var HOST = '172.16.2.233';
 var PORT = 3000;
 
 // シリアルポートのインスタンス
 var sp;
-
+const exec = require('child_process').exec;
 	
 // 使用可能なCOMポートを書き出す
 serialport.list(function (err, ports) {
@@ -17,7 +17,7 @@ serialport.list(function (err, ports) {
 	});	
 	
 	// シリアルポートのインスタンスを作成する
-	sp = new serialport(ports[0].comName, {
+	sp = new serialport("/dev/ttyACM0", {
 		baudRate: 9600,
 		dataBits: 8,
 		parity: 'none',
@@ -86,9 +86,24 @@ serialport.list(function (err, ports) {
 			// serial→tcp
 			//dataArray = [1,2,3];
 			sock.write(dataArray.join(''));		
+			
+
+			
 		});
 		
 	}).listen(PORT, HOST);
+	
+			exec("/home/pi/sharedRP/Plain-HTML/a.out",
+				//{cwd: '/home/pi/sharedRP/Plain-HTML'},
+				function(error, stdout, stderr) {
+					if (error) {
+						console.error('exec error:' + error);
+						return;
+					}
+					console.log('stdout: ' + stdout);
+					console.log('stderr: ' + stderr);
+				}
+			);
 
 });
 
