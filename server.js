@@ -93,7 +93,7 @@ serialport.list(function (err, ports) {
 		
 	}).listen(PORT, HOST);
 	
-	const ls = spawn('./a.out', [1]);
+	const ls = spawn('./a.out', [444]);
 	
 	ls.stdout.on('data', (data) => {
 	  console.log(`stdout: ${data}`);
