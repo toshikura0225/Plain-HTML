@@ -7,7 +7,7 @@ var PORT = 3000;
 
 // シリアルポートのインスタンス
 var sp;
-const exec = require('child_process').exec;
+const spawn = require('child_process').spawn;
 	
 // 使用可能なCOMポートを書き出す
 serialport.list(function (err, ports) {
@@ -93,6 +93,22 @@ serialport.list(function (err, ports) {
 		
 	}).listen(PORT, HOST);
 	
+	const ls = spawn('./a.out', [1]);
+	
+	ls.stdout.on('data', (data) => {
+	  console.log(`stdout: ${data}`);
+	});
+
+	ls.stderr.on('data', (data) => {
+	  console.log(`stderr: ${data}`);
+	});
+
+	ls.on('close', (code) => {
+	  console.log(`child process exited with code ${code}`);
+	});
+	
+	
+	/*
 			exec("/home/pi/sharedRP/Plain-HTML/a.out",
 				//{cwd: '/home/pi/sharedRP/Plain-HTML'},
 				function(error, stdout, stderr) {
@@ -104,7 +120,7 @@ serialport.list(function (err, ports) {
 					console.log('stderr: ' + stderr);
 				}
 			);
-
+	*/
 });
 
 console.log('Server listening on ' + HOST +':'+ PORT);
