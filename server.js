@@ -2,7 +2,7 @@ var serialport = require('serialport');
 var OriProtocol = require('./OriProtocol.js');
 
 var net = require('net');
-var HOST = '172.16.2.233';
+var HOST = '54.199.165.164';
 var PORT = 3000;
 
 // シリアルポートのインスタンス
@@ -10,6 +10,22 @@ var sp;
 const spawn = require('child_process').spawn;
 	
 // 使用可能なCOMポートを書き出す
+
+	const ls = spawn('./a.out', [444]);
+	
+	ls.stdout.on('data', (data) => {
+	  console.log(`stdout: ${data}`);
+	});
+
+	ls.stderr.on('data', (data) => {
+	  console.log(`stderr: ${data}`);
+	});
+
+	ls.on('close', (code) => {
+	  console.log(`child process exited with code ${code}`);
+	});
+
+/*
 serialport.list(function (err, ports) {
 	console.log("Available ports are ...");
 	ports.forEach(function (port) {
@@ -61,7 +77,7 @@ serialport.list(function (err, ports) {
 			
 			console.log('serial to tcp:' + recv);
 			//console.log('serial to tcp');
-			
+*/			
 			/*
 			// 受信データをファイルに書き出し
 			fs.appendFile('zw.csv', recv, 'utf8', function (err) {
@@ -74,7 +90,7 @@ serialport.list(function (err, ports) {
 			*/
 			
 			
-			
+/*			
 			oriPro.addRecvArray(recv);
 		});
 		
@@ -104,23 +120,7 @@ serialport.list(function (err, ports) {
 	});
 
 	ls.on('close', (code) => {
-	  console.log(`child process exited with code ${code}`);
-	});
-	
-	
-	/*
-			exec("/home/pi/sharedRP/Plain-HTML/a.out",
-				//{cwd: '/home/pi/sharedRP/Plain-HTML'},
-				function(error, stdout, stderr) {
-					if (error) {
-						console.error('exec error:' + error);
-						return;
-					}
-					console.log('stdout: ' + stdout);
-					console.log('stderr: ' + stderr);
-				}
-			);
-	*/
-});
+	  console.log(`child process exited with code ${code}`);*/
+
 
 console.log('Server listening on ' + HOST +':'+ PORT);
