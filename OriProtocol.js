@@ -1,4 +1,4 @@
-
+// OriProtocolクラス
 OriProtocol = function(argCallback) {
 	
 	this.recvData = [];
@@ -10,17 +10,22 @@ OriProtocol = function(argCallback) {
 
 module.exports = OriProtocol;
 
+// 受信状態
 var recvStateType = {
 	watingSTX : 0,
 	watingETX : 1,
 	watingBCC : 2,
 };
 
+// ASCIIコード
 var ASCIIChar = {
 	STX : 2,
 	ETX : 3,
+	EOT : 4,
+	ENQ : 5,
 };
 
+// BCCを取得する（STXの次からETXまでのBCC）
 OriProtocol.prototype.getBCC = function(dataArray) {
 	
 	var afterSTX = false;
@@ -43,7 +48,19 @@ OriProtocol.prototype.getBCC = function(dataArray) {
 	
 	return bcc;
 }
-	
+
+// ポーリング要求のデータ配列を取得する
+OriProtocol.prototype.getPollingBytes = function(address, command) {
+
+	return [ASCIIChar.EOT,
+			address / 10 + 0x30,
+			address % 10 + 0x30,
+			command.charCodeAt(0),
+			command.charCodeAt(1),
+			ASCIIChar.ENQ];
+}
+
+// 受信データ配列に引数のデータ配列を追加する
 OriProtocol.prototype.addRecvArray = function(argArray) {
 	
 	for(var i=0; i<argArray.length; i++) {
