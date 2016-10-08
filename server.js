@@ -1,7 +1,7 @@
 const Http = require('http');
 const Fs = require('fs');
 const Url = require('url');
-const OriProtocol = require('./OriProtocol.js');
+const OriMasterProtocol = require('./OriMasterProtocol.js');
 const spawn = require('child_process').spawn;
 var mongoose = require('mongoose');
 
@@ -81,7 +81,7 @@ nspSerialSocket.on('connection', function(socket){
 	
 	// シリアル通信デバイスからデータによる受信イベントハンドラ
 	socket.on('serial-data', function(data) {
-		orionProtocol.addRecvArray(data);
+		orionMasterProtocol.addRecvArray(data);
 	});
 });
 
@@ -93,12 +93,12 @@ nspSerialSocket.on("disconnect", function () {
 });
 
 // オリオンプロトコルのインスタンスを作成（引数はポーリング応答データ受信完了時のイベントハンドラ）
-var orionProtocol = new OriProtocol(function(arrRecevData) {
+var orionMasterProtocol = new OriMasterProtocol(function(arrRecevData) {
 	
 	console.log(`ポーリング応答データを受信完了。データ長：${arrRecevData.length}`);
 	
 	// 受信データから値の配列を取得
-	var numberArray = orionProtocol.getPollingDataArray(arrRecevData);
+	var numberArray = orionMasterProtocol.getPollingDataArray(arrRecevData);
 	console.log(numberArray.join(','));
 	
 	/*
@@ -123,9 +123,10 @@ var orionProtocol = new OriProtocol(function(arrRecevData) {
 
 // シリアル通信デバイスにポーリングを送信する
 function pollingZW() {
-	var pollingData = orionProtocol.getPollingBytes(0, "ZW");
+	var pollingData = orionMasterProtocol.getPollingBytes(0, "ZW");
 	console.log(`シリアル通信デバイスへポーリングデータを送信:${pollingData}`);
 	nspSerialSocket.emit('serial-host-request', pollingData);
+}
 
 	
 // ■■■■■■■■　MongoDB関連　■■■■■■■■■
