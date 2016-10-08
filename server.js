@@ -126,3 +126,50 @@ function pollingZW() {
 }
 
 console.log('server.js running!');
+
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/rks', function(err) {
+	if (err) {
+		console.log(`connect error ${err}`);
+	} else {
+		console.log('connection success!');
+	}
+});
+
+var rksSchema = new mongoose.Schema({
+	pv: Number,
+	sv: Number,
+	md: Number,
+	date: Date,
+});
+
+var Rks = mongoose.model('rks', rksSchema);
+
+var rks = new Rks({pv: 12.3, sv: 34.5, md: 11, date: new Date()});
+rks.save(function(err) {
+	if (err) {
+		console.log(`save error:${err}`);
+	} else {
+		console.log("ok");
+		
+		start_date = new Date();
+		start_date.setMinutes(50);
+		
+		console.log(start_date);
+		
+		Rks.find({date:{$gte: start_date,$lte: new Date()}}, function(err, docs) {
+			if(!err) {
+				console.log("num of ite => " + docs.length);
+				for(var i=0; i<docs.length; i++) {
+					console.log(docs[i]);
+				}
+				mongoose.disconnect();
+				process.exit();
+			} else {
+				console.log("find error");
+			}
+		});
+	}
+});
+
+
