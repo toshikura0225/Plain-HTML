@@ -101,3 +101,44 @@ OriProtocol.prototype.addRecvArray = function(argArray) {
 		}
 	}
 }
+
+// ポーリング応答データからデータ配列を取得
+OriProtocol.prototype.getPollingDataArray = function(argArray) {
+
+	var retDataArray = [];	// 戻り値として返す配列
+	var afterSTX = false;	// STXより後のデータか
+	var num = 0.0, decimalPlace = 0, afterPoint = false;	// 値
+	var init = function() {num = 0.0; decimalPlace = 0; afterPoint = false};	// 値を初期化
+	var toNum = function(ascii_code) {return (ascii_code - 48);};	// ASCIIコードから数値へ
+	
+	for(i=0; i<argArray.length; i++)
+	{
+		if(afterSTX) {
+			if(argArray[i] == ASCIIChar.ETX) {	// ETX
+				break;
+			}
+			else if(String.fromCharCode(argArray[i]) >= '0' && String.fromCharCode(argArray[i]) <= '9') {	// 数値
+				num = num * 10 + toNum(argArray[i]);
+				decimalPlace = (afterPoint) ? (decimalPlace+1) : 0;
+			}
+			else if(String.fromCharCode(argArray[i]) == ' ') {	// スペース
+				continue;
+			}
+			else if(String.fromCharCode(argArray[i]) == ',') {	// カンマ
+				num /= Math.pow(10, decimalPlace);
+				retDataArray.push(num);
+				init();
+			}
+			else if(String.fromCharCode(argArray[i]) == '.') {	// ピリオド
+				afterPoint = true;
+			}
+		}
+		else {
+			if(argArray[i] == ASCIIChar.STX) {	// STX
+				afterSTX = true;
+			}
+		}
+	}
+
+	return retDataArray;
+}

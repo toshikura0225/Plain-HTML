@@ -2,7 +2,7 @@ const Http = require('http');
 const Fs = require('fs');
 const Url = require('url');
 const OriProtocol = require('./OriProtocol.js');
-
+const spawn = require('child_process').spawn;
 
 // ■■■■■■■■　HTML関連　■■■■■■■■■
 var http_src = Fs.readFileSync('./index.html');		// HTMLファイルのソースを同期処理で読み出す
@@ -94,8 +94,27 @@ nspSerialSocket.on("disconnect", function () {
 // オリオンプロトコルのインスタンスを作成（引数はポーリング応答データ受信完了時のイベントハンドラ）
 var orionProtocol = new OriProtocol(function(arrRecevData) {
 	
-	console.log(`ポーリング応答のデータをすべて受信完了。データ数：${arrRecevData.length}`);
+	console.log(`ポーリング応答データを受信完了。データ長：${arrRecevData.length}`);
 	
+	// 受信データから値の配列を取得
+	var numberArray = orionProtocol.getPollingDataArray(arrRecevData);
+	console.log(numberArray.join(','));
+	
+	/*
+	const ls = spawn('./a.out', [444]);
+	
+	ls.stdout.on('data', (data) => {
+	  console.log(`stdout: ${data}`);
+	});
+
+	ls.stderr.on('data', (data) => {
+	  console.log(`stderr: ${data}`);
+	});
+
+	ls.on('close', (code) => {
+	  console.log(`child process exited with code ${code}`);
+	});
+	*/
 	
 });
 
