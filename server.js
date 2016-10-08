@@ -3,6 +3,7 @@ const Fs = require('fs');
 const Url = require('url');
 const OriProtocol = require('./OriProtocol.js');
 const spawn = require('child_process').spawn;
+var mongoose = require('mongoose');
 
 // ■■■■■■■■　HTML関連　■■■■■■■■■
 var http_src = Fs.readFileSync('./index.html');		// HTMLファイルのソースを同期処理で読み出す
@@ -125,9 +126,9 @@ function pollingZW() {
 	var pollingData = orionProtocol.getPollingBytes(0, "ZW");
 	console.log(`シリアル通信デバイスへポーリングデータを送信:${pollingData}`);
 	nspSerialSocket.emit('serial-host-request', pollingData);
-}
 
-var mongoose = require('mongoose');
+	
+// ■■■■■■■■　MongoDB関連　■■■■■■■■■
 mongoose.connect('mongodb://localhost:27017/rks', function(err) {
 	if (err) {
 		console.log(`connect error ${err}`);
