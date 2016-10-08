@@ -58,28 +58,25 @@ Serialport.list(function (err, ports) {
 
 
 // ■■■■■■■■■■■　socket.io（クライアント）関連　■■■■■■■■■■■■
+
 // socket.io-clientのインスタンスを作成
 var socketio_server = "http://" + SOCKET_IO_SERVER_HOST + ":" + SOCKET_IO_SERVER_PORT + "/" + SOCKET_IO_SERVER_NSP;
-//var socketio_server = "http://" + SOCKET_IO_SERVER_HOST + ":" + SOCKET_IO_SERVER_PORT;
-console.log(`connecting to ${socketio_server}`);
 var socketioClient = Socket_io_client.connect(socketio_server);
+
+console.log(`connecting to ${socketio_server}`);
 
 // 接続完了イベントハンドラを定義
 socketioClient.on('connect', function (socket) {
 	
-	console.log("socket.ioサーバーへの接続完了");
-	
-	//socketioClient.emit("serial-data", "OK");
-	
+	console.log(`${socketio_server}への接続完了`);
 	
 	// socket.ioサーバーからデータを受信した時のイベントハンドラを定義
 	socketioClient.on('serial-host-request', function (arrRecvData) {
 		
-		//console.log(`socket.io シリアル通信ホストからの受信：${arrRecvData}`);
 		// socket.ioサーバーからの受信データをシリアルポートへ転送
 		if (serial) {
 			
-			// 送信
+			// シリアルポートへ送信
 			serial.write(arrRecvData, function (err, results) {
 				
 				// 送信エラーなし
@@ -96,9 +93,5 @@ socketioClient.on('connect', function (socket) {
 				}
 			});
 		}		
-	});
-	
-	socketioClient.on('msg', function (data) {
-		console.log(`socket.ioその他データを受信：${data}`);
 	});
 });
