@@ -90,8 +90,7 @@ nspMonitorSocket.on('connection', function(socket){
 });
 
 setInterval(function() {
-//	nspMonitorSocket.emit("monitor-data", {time_stamp: latestDocument.date, monitor_data: latestDocument.val});
-	nspMonitorSocket.emit("monitor-data", {time_stamp: new Date(), monitor_data: latestDocument.val});
+	nspMonitorSocket.emit("monitor-data", {time_stamp: latestDocument.date, monitor_data: latestDocument.val});
 }, 2000);
 
 
@@ -163,7 +162,7 @@ mongoose.connect('mongodb://localhost:27017/rks', function(err) {
 		
 		setInterval(function() {
 //			Rks.find({}, {}, {sort:{created: -1}, limit:1}, function(err, docs) {
-			Rks.find({}, {}, {sort:{date: -1}, limit:1}, function(err, docs) {
+			Rks.findOne({}, {}, {sort:{date: -1}, limit:1}, function(err, doc) {
 				if(!err) {
 					//console.log("num of ite => " + docs.length);
 					//for(var i=0; i<docs.length; i++) {
@@ -172,10 +171,10 @@ mongoose.connect('mongodb://localhost:27017/rks', function(err) {
 					//mongoose.disconnect();
 					//process.exit();
 					//console.log(docs[0].seq);
-					if(docs.length > 0) {
-						latestDocument = docs[0];
+					//if(docs.length > 0) {
+						latestDocument = doc;
 						//console.log(docs[0].date);
-					}
+					//}
 				} else {
 					console.log("find error");
 				}
