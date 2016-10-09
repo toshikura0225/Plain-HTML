@@ -52,11 +52,10 @@ var httpServer = Http.createServer(function (req, res) {
 }).listen(process.env.PORT || 3000);	// サーバー内環境（Herokuの場合に使用）のポートまたは3000番で待受
 
 
-// ■■■■■■■■　socket.ioサーバー関連　■■■■■■■■■
+// ■■■■■■■■　socket.ioサーバー関連■■■■■■■■■
 
 // socket.ioサーバーとして接続待ち
 var socket_io = require('socket.io').listen(httpServer);
-var nspSerialSocket = socket_io.of('/nsp_serial');	// シリアル通信デバイスとの接続のためのNamespace
 
 // socket.ioに接続された時のイベントハンドラ
 socket_io.sockets.on('connection', function(socket) {
@@ -74,8 +73,29 @@ socket_io.sockets.on('connection', function(socket) {
 	});
 });
 
+// --------------------　WEBブラウザへのデータ応答機能　--------------------
+var nspMonitorSocket = socket_io.of('/nsp_monitor');
+nspMonitorSocket.on('connection', function(socket){
+		
+	console.log("socket.io-client（シリアル通信スレーブ）が接続されました");
+	
+	// 定期的なポーリングを開始する
+	pollingIntervalID = setInterval(pollingZW, 2000);
+	
+	// シリアル通信デバイスからデータによる受信イベントハンドラ
+	socket.on('serial-data', function(data) {
+		orionMasterProtocol.addRecvArray(data);
+	});
+});
+
+setInterval(function() {
+	console.log("sending...");
+	nspMonitorSocket.emit("monitor-data", "OK");
+}, 2000);
+
 
 // --------------------　シリアル通信のホスト機能　--------------------
+var nspSerialSocket = socket_io.of('/nsp_serial');	// シリアル通信デバイスとの接続のためのNamespace
 var pollingIntervalID;	// 定期的にポーリングするためのsetInterval関数のID
 
 nspSerialSocket.on('connection', function(socket){

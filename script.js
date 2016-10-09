@@ -8,10 +8,10 @@ $(function () {
 var socket;
 function debug1() {
 	// サーバーに接続
-	socket = io.connect();
+	socket = io.connect("/nsp_monitor");
 	
 	// メッセージ受信イベント（PVを受信）
-	socket.on('path-through', function (data) {
+	socket.on('monitor-data', function (data) {
 		
 		$('#idReceived').prepend(data + '<br/>');		// デバッグ用に書き出し
 		
