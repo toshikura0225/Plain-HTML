@@ -126,7 +126,9 @@ var orionMasterProtocol = new OriMasterProtocol(function(arrRecevData) {
 // シリアル通信デバイスにポーリングを送信する
 function pollingZW() {
 	var pollingData = orionMasterProtocol.getPollingBytes(0, "ZW");
-	console.log(`シリアル通信デバイスへポーリングデータを送信:${pollingData}`);
+	console.log();
+	console.log(new Date());
+	console.log(`シリアル通信デバイスへポーリングデータを送信:${pollingData}}`);
 	nspSerialSocket.emit('serial-host-request', pollingData);
 }
 
@@ -167,26 +169,9 @@ function saveZW(arrRecevData) {
 	});
 }
 
-function getLatestZW() {
-	//Rks.find({date:{$gte: start_date,$lte: new Date()}}, function(err, docs) {
-	Rks.find({}, {}, {sort:{created: -1}, limit:1}, function(err, docs) {
-		if(!err) {
-			//console.log("num of ite => " + docs.length);
-			//for(var i=0; i<docs.length; i++) {
-			//	console.log(docs[i]);
-			//}
-			//mongoose.disconnect();
-			//process.exit();
-			console.log(docs[0].seq);
-		} else {
-			console.log("find error");
-		}
-	});
-	
-}
-
 
 // ■■■■■■■■　TCP/IPサーバー関連関連　■■■■■■■■■
+var tcpSocket;
 net.createServer(function(sock) {
 	
 	// TCPサーバーが接続しました。socketオブジェクトが自動的に割り当てられます。
@@ -209,6 +194,7 @@ net.createServer(function(sock) {
 		console.log('ERROR: ' + err.stack);
 	});
 	
+	tcpSocket = sock;
 	
 }).listen(TCPIP_SERVER_PORT, TCPIP_SERVER_HOST);
 
@@ -218,7 +204,23 @@ var oriReplicaProtocol = new OriReplicaProtocol( function(polling) {
 	if(polling.command == "ZW")
 	{
 		console.log("ZW data received");
-		getLatestZW();
+		
+		Rks.find({}, {}, {sort:{created: -1}, limit:1}, function(err, docs) {
+			if(!err) {
+				//console.log("num of ite => " + docs.length);
+				//for(var i=0; i<docs.length; i++) {
+				//	console.log(docs[i]);
+				//}
+				//mongoose.disconnect();
+				//process.exit();
+				//console.log(docs[0].seq);
+					
+				tcpSocket.write(new Buffer(docs[0].seq));
+				
+			} else {
+				console.log("find error");
+			}
+		});
 	}
 });
 	

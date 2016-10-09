@@ -81,7 +81,7 @@ socketioClient.on('connect', function (socket) {
 				
 				// 送信エラーなし
 				if (!err) {
-					console.log(`シリアルポート送信：${arrRecvData} bytes`);
+					console.log(`シリアルポート送信：${arrRecvData} bytes ${new Date()}`);
 				}
 				
 				// 送信エラー
