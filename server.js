@@ -2,8 +2,14 @@ const Http = require('http');
 const Fs = require('fs');
 const Url = require('url');
 const OriMasterProtocol = require('./OriMasterProtocol.js');
+const OriReplicaProtocol = require('./OriReplicaProtocol.js');
 const spawn = require('child_process').spawn;
 var mongoose = require('mongoose');
+var net = require('net');
+
+var TCPIP_SERVER_HOST = '127.0.0.1';
+var TCPIP_SERVER_PORT = 3001;
+
 
 // ■■■■■■■■　HTML関連　■■■■■■■■■
 var http_src = Fs.readFileSync('./index.html');		// HTMLファイルのソースを同期処理で読み出す
@@ -96,11 +102,7 @@ nspSerialSocket.on("disconnect", function () {
 var orionMasterProtocol = new OriMasterProtocol(function(arrRecevData) {
 	
 	console.log(`ポーリング応答データを受信完了。データ長：${arrRecevData.length}`);
-	
-	// 受信データから値の配列を取得
-	var numberArray = orionMasterProtocol.getPollingDataArray(arrRecevData);
-	console.log(numberArray.join(','));
-	
+
 	/*
 	const ls = spawn('./a.out', [444]);
 	
@@ -118,7 +120,7 @@ var orionMasterProtocol = new OriMasterProtocol(function(arrRecevData) {
 	*/
 	
 	// ポーリング応答データをデータベースに保存する
-	saveZW(numberArray);
+	saveZW(arrRecevData);
 });
 
 // シリアル通信デバイスにポーリングを送信する
@@ -142,39 +144,85 @@ var rksSchema = new mongoose.Schema({
 	sv: Number,
 	pv: Number,
 	md: Number,
+	seq: Array,
 	date: Date,
 });
 
 var Rks = mongoose.model('rks', rksSchema);
 
 // ポーリング応答データをデータベースに保存する
-function saveZW(numberArray) {
-
-	var rks = new Rks({sv: numberArray[0], pv: numberArray[1], md: numberArray[2], date: new Date()});
+function saveZW(arrRecevData) {
+	
+	// 受信データから値の配列を取得
+	var numberArray = orionMasterProtocol.getPollingDataArray(arrRecevData);
+	//console.log(numberArray.join(','));
+	
+	var rks = new Rks({sv: numberArray[0], pv: numberArray[1], md: numberArray[2], seq: arrRecevData, date: new Date()});
 	rks.save(function(err, doc, affected) {
 		if (err) {
 			console.log(`save error:${err}`);
 		} else {
-			console.log(doc);
-			/*
-			Rks.find({date:{$gte: start_date,$lte: new Date()}}, function(err, docs) {
-				if(!err) {
-					console.log("num of ite => " + docs.length);
-					for(var i=0; i<docs.length; i++) {
-						console.log(docs[i]);
-					}
-					mongoose.disconnect();
-					process.exit();
-				} else {
-					console.log("find error");
-				}
-			});
-			*/
+			//console.log(doc);
 		}
 	});
-
-
 }
+
+function getLatestZW() {
+	//Rks.find({date:{$gte: start_date,$lte: new Date()}}, function(err, docs) {
+	Rks.find({}, {}, {sort:{created: -1}, limit:1}, function(err, docs) {
+		if(!err) {
+			//console.log("num of ite => " + docs.length);
+			//for(var i=0; i<docs.length; i++) {
+			//	console.log(docs[i]);
+			//}
+			//mongoose.disconnect();
+			//process.exit();
+			console.log(docs[0].seq);
+		} else {
+			console.log("find error");
+		}
+	});
+	
+}
+
+
+// ■■■■■■■■　TCP/IPサーバー関連関連　■■■■■■■■■
+net.createServer(function(sock) {
+	
+	// TCPサーバーが接続しました。socketオブジェクトが自動的に割り当てられます。
+	console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
+
+	// 'data' イベントハンドラー
+	sock.on('data', function(data) {
+		
+		//console.log('received on tcp: ' + data );
+		oriReplicaProtocol.addRecvArray(data);
+	});
+	
+	// 'close'イベントハンドラー
+	sock.on('close', function(had_error) {
+		console.log('CLOSED. Had Error: ' + had_error);
+	});
+	
+	// 'errer'イベントハンドラー
+	sock.on('error', function(err) {
+		console.log('ERROR: ' + err.stack);
+	});
+	
+	
+}).listen(TCPIP_SERVER_PORT, TCPIP_SERVER_HOST);
+
+var oriReplicaProtocol = new OriReplicaProtocol( function(polling) {
+
+	
+	if(polling.command == "ZW")
+	{
+		console.log("ZW data received");
+		getLatestZW();
+	}
+});
+	
+
 
 console.log('server.js running!');
 

@@ -94,7 +94,7 @@ OriMasterProtocol.prototype.addRecvArray = function(argArray) {
 		else if(this.recvState == recvStateType.watingSTX) {
 			
 			if(argArray[i] == ASCIIChar.STX) {
-				
+				this.recvData = [];
 				this.recvData.push(argArray[i]);
 				this.recvState = recvStateType.watingETX;
 			}
