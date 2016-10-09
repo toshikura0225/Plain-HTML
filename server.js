@@ -4,11 +4,14 @@ const Url = require('url');
 const OriMasterProtocol = require('./OriMasterProtocol.js');
 const OriReplicaProtocol = require('./OriReplicaProtocol.js');
 const spawn = require('child_process').spawn;
-var mongoose = require('mongoose');
-var net = require('net');
+const mongoose = require('mongoose');
+const net = require('net');
 
-var TCPIP_SERVER_HOST = '127.0.0.1';
-var TCPIP_SERVER_PORT = 3001;
+const TCPIP_SERVER_HOST = '127.0.0.1';
+const TCPIP_SERVER_PORT = 3001;
+
+var latestData = {bufferArray : new Buffer([]), valueArray : []};
+
 
 
 // ■■■■■■■■　HTML関連　■■■■■■■■■
@@ -77,20 +80,12 @@ socket_io.sockets.on('connection', function(socket) {
 var nspMonitorSocket = socket_io.of('/nsp_monitor');
 nspMonitorSocket.on('connection', function(socket){
 		
-	console.log("socket.io-client（シリアル通信スレーブ）が接続されました");
+	console.log("socket.io-client（モニター側）が接続されました");
 	
-	// 定期的なポーリングを開始する
-	pollingIntervalID = setInterval(pollingZW, 2000);
-	
-	// シリアル通信デバイスからデータによる受信イベントハンドラ
-	socket.on('serial-data', function(data) {
-		orionMasterProtocol.addRecvArray(data);
-	});
 });
 
 setInterval(function() {
-	console.log("sending...");
-	nspMonitorSocket.emit("monitor-data", "OK");
+	nspMonitorSocket.emit("monitor-data", latestData.valueArray);
 }, 2000);
 
 
@@ -159,6 +154,30 @@ mongoose.connect('mongodb://localhost:27017/rks', function(err) {
 		console.log(`connect error ${err}`);
 	} else {
 		console.log('connection success!');
+		
+		setInterval(function() {
+			Rks.find({}, {}, {sort:{created: -1}, limit:1}, function(err, docs) {
+				if(!err) {
+					//console.log("num of ite => " + docs.length);
+					//for(var i=0; i<docs.length; i++) {
+					//	console.log(docs[i]);
+					//}
+					//mongoose.disconnect();
+					//process.exit();
+					//console.log(docs[0].seq);
+					if(docs.length > 0) {
+						latestData.bufferArray = docs[0].buf;
+						latestData.valueArray = docs[0].val;
+					}
+					else {
+						latestData.bufferArray = new Buffer([]);
+					}
+					
+				} else {
+					console.log("find error");
+				}
+			});
+		}, 1000);
 	}
 });
 
@@ -166,7 +185,8 @@ var rksSchema = new mongoose.Schema({
 	sv: Number,
 	pv: Number,
 	md: Number,
-	seq: Array,
+	buf: [Buffer],
+	val: Array,
 	date: Date,
 });
 
@@ -179,7 +199,7 @@ function saveZW(arrRecevData) {
 	var numberArray = orionMasterProtocol.getPollingDataArray(arrRecevData);
 	//console.log(numberArray.join(','));
 	
-	var rks = new Rks({sv: numberArray[0], pv: numberArray[1], md: numberArray[2], seq: arrRecevData, date: new Date()});
+	var rks = new Rks({sv: numberArray[0], pv: numberArray[1], md: numberArray[2], buf: new Buffer(arrRecevData), val : numberArray, date: new Date()});
 	rks.save(function(err, doc, affected) {
 		if (err) {
 			console.log(`save error:${err}`);
@@ -224,23 +244,8 @@ var oriReplicaProtocol = new OriReplicaProtocol( function(polling) {
 	if(polling.command == "ZW")
 	{
 		console.log("ZW data received");
-		
-		Rks.find({}, {}, {sort:{created: -1}, limit:1}, function(err, docs) {
-			if(!err) {
-				//console.log("num of ite => " + docs.length);
-				//for(var i=0; i<docs.length; i++) {
-				//	console.log(docs[i]);
-				//}
-				//mongoose.disconnect();
-				//process.exit();
-				//console.log(docs[0].seq);
-					
-				tcpSocket.write(new Buffer(docs[0].seq));
-				
-			} else {
-				console.log("find error");
-			}
-		});
+		console.log(latestData.bufferArray[0]);
+		tcpSocket.write(latestData.bufferArray[0]);
 	}
 });
 	

@@ -13,6 +13,7 @@ function debug1() {
 	// メッセージ受信イベント（PVを受信）
 	socket.on('monitor-data', function (data) {
 		
+		console.log("data = " + data[0]);
 		$('#idReceived').prepend(data + '<br/>');		// デバッグ用に書き出し
 		
 	});
