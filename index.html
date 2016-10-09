@@ -33,8 +33,13 @@
 		// socket.ioサーバーに接続
 		socket = io.connect("/nsp_monitor");
 		// メッセージ受信イベント（PVを受信）
-		socket.on('monitor-data', function (arrData) {
+		socket.on('monitor-data', function (jsonData) {
 			
+			var arrData = jsonData.monitor_data;
+			
+			// 更新日時
+			$('#idTimeStamp').text(new Date(jsonData.time_stamp));
+
 			//var arr_data = new Uint8Array(data);
 			//$('#idReceived').prepend(arr_data + '<br/>');		// デバッグ用に書き出し
 			
@@ -66,18 +71,18 @@
 	</script>
 	<style type="text/css">
 		table td {
-			font-size: 1.2em;
+			font-size: 1em;
 			font-family: Meiryo;
 		}
 	</style>
 </head>
 
 <body>
-	
+	<div id="idTimeStamp">　</div>
 	<table border="1">
 		<tr valign="top">
+			<!--
 			<td = width="200px">
-				<!--
 				<table width="100%">
 					<tr>
 						<td>
@@ -100,8 +105,8 @@
 						</td>
 					</tr>
 				</table>
-				-->
 			</td>
+			-->
 			<td = width="300px">
 			
 				<table border="1" width="100%">

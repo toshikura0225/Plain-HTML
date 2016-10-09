@@ -10,7 +10,7 @@ const net = require('net');
 const TCPIP_SERVER_HOST = '127.0.0.1';
 const TCPIP_SERVER_PORT = 3001;
 
-var latestData = {bufferArray : new Buffer([]), valueArray : []};
+var latestDocument;
 
 // ■■■■■■■■　HTML関連　■■■■■■■■■
 var http_src = Fs.readFileSync('./index.html');		// HTMLファイルのソースを同期処理で読み出す
@@ -90,7 +90,8 @@ nspMonitorSocket.on('connection', function(socket){
 });
 
 setInterval(function() {
-	nspMonitorSocket.emit("monitor-data", latestData.valueArray);
+//	nspMonitorSocket.emit("monitor-data", {time_stamp: latestDocument.date, monitor_data: latestDocument.val});
+	nspMonitorSocket.emit("monitor-data", {time_stamp: new Date(), monitor_data: latestDocument.val});
 }, 2000);
 
 
@@ -172,14 +173,9 @@ mongoose.connect('mongodb://localhost:27017/rks', function(err) {
 					//process.exit();
 					//console.log(docs[0].seq);
 					if(docs.length > 0) {
-						latestData.bufferArray = docs[0].buf;
-						latestData.valueArray = docs[0].val;
+						latestDocument = docs[0];
 						//console.log(docs[0].date);
 					}
-					else {
-						latestData.bufferArray = new Buffer([]);
-					}
-					
 				} else {
 					console.log("find error");
 				}
@@ -251,8 +247,9 @@ var oriReplicaProtocol = new OriReplicaProtocol( function(polling) {
 	if(polling.command == "ZW")
 	{
 		console.log("ZW data received");
-		console.log(latestData.bufferArray[0]);
-		tcpSocket.write(latestData.bufferArray[0]);
+		//console.log(latestData.bufferArray[0]);
+		//tcpSocket.write(latestData.bufferArray[0]);
+		tcpSocket.write(latestDocument.buf[0]);
 	}
 });
 	
