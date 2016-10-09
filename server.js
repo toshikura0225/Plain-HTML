@@ -12,12 +12,11 @@ const TCPIP_SERVER_PORT = 3001;
 
 var latestData = {bufferArray : new Buffer([]), valueArray : []};
 
-
-
 // ■■■■■■■■　HTML関連　■■■■■■■■■
 var http_src = Fs.readFileSync('./index.html');		// HTMLファイルのソースを同期処理で読み出す
 var js_src = Fs.readFileSync('./script.js');
 var css_src = Fs.readFileSync('./style.css');
+var flot_src = Fs.readFileSync('./jquery.flot.js');
 
 // HTTPサーバーを作成＆接続待ち
 var httpServer = Http.createServer(function (req, res) {
@@ -42,6 +41,12 @@ var httpServer = Http.createServer(function (req, res) {
 	else if (url_parts.pathname == '/style.css') {
 		res.writeHead(200, { 'Content-Type': 'text/css' });
 		res.write(css_src);
+		res.end();
+	}
+	
+	else if (url_parts.pathname == '/jquery.flot.js') {
+		res.writeHead(200, { 'Content-Type': 'text/javascript' });
+		res.write(flot_src);
 		res.end();
 	}
 	

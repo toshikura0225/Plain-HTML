@@ -8,32 +8,182 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title>
-		161002 socket.ioプレーン
+		プレーンページ
 	</title>
 
-	<link rel="stylesheet" href="style.css" />
+	<!--<link rel="stylesheet" href="style.css" />-->
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="jquery.flot.js"></script>
 	<script src="script.js" type="text/javascript"></script>
-
-	<style type="text/css">
-	</style>
-	
 	<script type="text/javascript">
+		
+	var socket;
+	
+
+	$(function () {	
+
+		<!-- データの作成 -->
+		var d1 = [[0, 19], [4, 21], [8, 15], [11, 9]];
+		var d2 = [[0, 20], [7, 20], [7, 10], [12, 10]];
+ 
+		<!-- placeholderにグラフを描画 -->
+		$.plot("#placeholder", [ d1, d2]);
+		
+		// socket.ioサーバーに接続
+		socket = io.connect("/nsp_monitor");
+		// メッセージ受信イベント（PVを受信）
+		socket.on('monitor-data', function (arrData) {
+			
+			//var arr_data = new Uint8Array(data);
+			//$('#idReceived').prepend(arr_data + '<br/>');		// デバッグ用に書き出し
+			
+			// 運転状態
+			$('#idUnten').text(arrData[2]);
+			
+			// 測定液温
+			$('#idPV').text(arrData[1]);
+			
+			// 設定液温
+			$('#idSV').text(arrData[0]);
+			
+			// 警報
+			$('#idAlarm').text(arrData[22]);
+			
+			// 警報履歴１
+			$('#idHistory1').text(arrData[23]);
+			
+			// 警報履歴２
+			$('#idHistory2').text(arrData[24]);
+			
+			// 警報履歴３
+			$('#idHistory3').text(arrData[25]);
+		});	
+		
+	});
+	
+	
 	</script>
+	<style type="text/css">
+		table td {
+			font-size: 1.2em;
+			font-family: Meiryo;
+		}
+	</style>
 </head>
 
 <body>
+	
+	<table border="1">
+		<tr valign="top">
+			<td = width="200px">
+				<!--
+				<table width="100%">
+					<tr>
+						<td>
+							<select id="idPortName" style="width: 100%"></select>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<select id="idDeviceAddress" style="width: 100%"></select>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<button onclick="startLogging()" style="width: 100%">開始</button>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="text" id="idMail" style="width: 100%" value="kuramata-toshihiro@orionkikai.co.jp"></input>
+						</td>
+					</tr>
+				</table>
+				-->
+			</td>
+			<td = width="300px">
+			
+				<table border="1" width="100%">
+					<tr>
+						<td>運転状態</td>
+						<td id="idUnten" style="width:35%">　</td>
+					</tr>
+					<tr>
+						<td>測定液温</td>
+						<td id="idPV"></td>
+					</tr>
+					<tr>
+						<td>設定液温</td>
+						<td id="idSV"></td>
+					</tr>
+					<tr>
+						<td>警報</td>
+						<td id="idAlarm"></td>
+					</tr>
+					<tr>
+						<td>警報履歴１</td>
+						<td id="idHistory1"></td>
+					</tr>
+					<tr>
+						<td>警報履歴２</td>
+						<td id="idHistory2"></td>
+					</tr>
+					<tr>
+						<td>警報履歴３</td>
+						<td id="idHistory3"></td>
+					</tr>
+					<tr>
+						<td>　</td>
+						<td>　</td>
+					</tr>
+					<tr>
+						<td>　</td>
+						<td>　</td>
+					</tr>
+					<tr>
+						<td>　</td>
+						<td>　</td>
+					</tr>
+					<tr>
+						<td>　</td>
+						<td>　</td>
+					</tr>
+					<tr>
+						<td>　</td>
+						<td>　</td>
+					</tr>
+					<tr>
+						<td>　</td>
+						<td>　</td>
+					</tr>
+				</table>
 
-	<button onclick="debug1()">debug1</button><br />
-	<button onclick="debug2()">debug2</button><br />
-	<button onclick="debug3()">debug3</button><br />
+				
+			</td>
+			<td = width="600px">			
+				<div id="placeholder" style="width:550px;height:550px"></div>
+			</td>
+		</tr>
+	</table>
+
+	<hr />
+	<!-- ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ -->
+	<!--
+	<button onclick="abc()">abc</button><br />
+	<button onclick="debug1()">接続</button><br />
+	<button onclick="debug2()">送信</button>
+	<br /><br />
+	<input type="text" size=50 id="abc">
+	<button onclick="debug3()">send command</button>
+	<br /><br />
 	<button onclick="debug4()">debug4</button><br />
 	<button onclick="debug5()">debug5</button><br />
-	
 	受信データ
 	<div id="idReceived"></div><br />
-	
+	<hr />	
+	<hr />
+	-->
 </body>
 
 </html>
