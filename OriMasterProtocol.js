@@ -107,14 +107,16 @@ OriMasterProtocol.prototype.getPollingDataArray = function(argArray) {
 
 	var retDataArray = [];	// 戻り値として返す配列
 	var afterSTX = false;	// STXより後のデータか
-	var num = 0.0, decimalPlace = 0, afterPoint = false;	// 値
-	var init = function() {num = 0.0; decimalPlace = 0; afterPoint = false};	// 値を初期化
+	var num = 0.0, decimalPlace = 0, afterPoint = false, err = "";	// 値
+	var init = function() {num = 0.0; decimalPlace = 0; afterPoint = false; err = ""};	// 値を初期化
 	var toNum = function(ascii_code) {return (ascii_code - 48);};	// ASCIIコードから数値へ
 	
 	for(i=0; i<argArray.length; i++)
 	{
 		if(afterSTX) {
 			if(argArray[i] == ASCIIChar.ETX) {	// ETX
+				num /= Math.pow(10, decimalPlace);
+				retDataArray.push(num);
 				break;
 			}
 			else if(String.fromCharCode(argArray[i]) >= '0' && String.fromCharCode(argArray[i]) <= '9') {	// 数値
@@ -125,12 +127,20 @@ OriMasterProtocol.prototype.getPollingDataArray = function(argArray) {
 				continue;
 			}
 			else if(String.fromCharCode(argArray[i]) == ',') {	// カンマ
-				num /= Math.pow(10, decimalPlace);
-				retDataArray.push(num);
+				if(err == "") {
+					num /= Math.pow(10, decimalPlace);
+					retDataArray.push(num);					
+				} else {
+					retDataArray.push(err + num);		
+				}
 				init();
 			}
 			else if(String.fromCharCode(argArray[i]) == '.') {	// ピリオド
 				afterPoint = true;
+			}
+			else if(String.fromCharCode(argArray[i]) == 'C'
+					|| String.fromCharCode(argArray[i]) == 'E') {	// 警報
+				err = "" + String.fromCharCode(argArray[i]);
 			}
 		}
 		else {

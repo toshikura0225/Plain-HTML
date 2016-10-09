@@ -161,7 +161,8 @@ mongoose.connect('mongodb://localhost:27017/rks', function(err) {
 		console.log('connection success!');
 		
 		setInterval(function() {
-			Rks.find({}, {}, {sort:{created: -1}, limit:1}, function(err, docs) {
+//			Rks.find({}, {}, {sort:{created: -1}, limit:1}, function(err, docs) {
+			Rks.find({}, {}, {sort:{date: -1}, limit:1}, function(err, docs) {
 				if(!err) {
 					//console.log("num of ite => " + docs.length);
 					//for(var i=0; i<docs.length; i++) {
@@ -173,6 +174,7 @@ mongoose.connect('mongodb://localhost:27017/rks', function(err) {
 					if(docs.length > 0) {
 						latestData.bufferArray = docs[0].buf;
 						latestData.valueArray = docs[0].val;
+						//console.log(docs[0].date);
 					}
 					else {
 						latestData.bufferArray = new Buffer([]);
