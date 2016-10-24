@@ -89,8 +89,10 @@ nspMonitorSocket.on('connection', function(socket){
 	
 });
 
-setInterval(function() {
-	nspMonitorSocket.emit("monitor-data", {time_stamp: latestDocument.date, monitor_data: latestDocument.val});
+setInterval(function () {
+	if (latestDocument !== undefined) {
+		nspMonitorSocket.emit("monitor-data", { time_stamp: latestDocument.date, monitor_data: latestDocument.val });
+	}
 }, 2000);
 
 
