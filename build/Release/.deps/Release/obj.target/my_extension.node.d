@@ -1,0 +1,1 @@
+cmd_Release/obj.target/my_extension.node := g++ -shared -pthread -rdynamic  -Wl,-soname=my_extension.node -o Release/obj.target/my_extension.node -Wl,--start-group Release/obj.target/my_extension/my_extension.o Release/obj.target/my_extension/md.o -Wl,--end-group 
