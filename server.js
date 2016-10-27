@@ -7,7 +7,7 @@ const spawn = require('child_process').spawn;
 const mongoose = require('mongoose');
 const net = require('net');
 
-const TCPIP_SERVER_HOST = '127.0.0.1';
+const TCPIP_SERVER_HOST = '172.16.2.206';
 const TCPIP_SERVER_PORT = 3001;
 
 var latestDocument;
@@ -90,7 +90,7 @@ nspMonitorSocket.on('connection', function(socket){
 });
 
 setInterval(function () {
-	if (latestDocument !== undefined) {
+	if (latestDocument !== undefined && latestDocument != null) {
 		nspMonitorSocket.emit("monitor-data", { time_stamp: latestDocument.date, monitor_data: latestDocument.val });
 	}
 }, 2000);
