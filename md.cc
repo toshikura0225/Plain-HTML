@@ -24,7 +24,7 @@ double arrInverseMatrix[NUM_OF_SRC][NUM_OF_SRC] = {
 };
 
 // MD値を取得する
-double GetMD(double arrSrc[])
+double CalcMD(double arrSrc[])
 {
 	double arrV[NUM_OF_SRC];	// 基準化データを算出する
 	

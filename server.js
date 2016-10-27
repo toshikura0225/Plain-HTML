@@ -174,7 +174,7 @@ mongoose.connect('mongodb://localhost:27017/rks', function(err) {
 					//process.exit();
 					//console.log(docs[0].seq);
 					//if(docs.length > 0) {
-						latestDocument = doc;
+					latestDocument = doc;
 						//console.log(docs[0].date);
 					//}
 				} else {
@@ -196,14 +196,26 @@ var rksSchema = new mongoose.Schema({
 
 var Rks = mongoose.model('rks', rksSchema);
 
+// MD値計算
+var mdCalculator = require('./build/Release/my_extension');
+
 // ポーリング応答データをデータベースに保存する
 function saveZW(arrRecevData) {
 	
 	// 受信データから値の配列を取得
 	var numberArray = orionMasterProtocol.getPollingDataArray(arrRecevData);
 	//console.log(numberArray.join(','));
-	
-	var rks = new Rks({sv: numberArray[0], pv: numberArray[1], md: numberArray[2], buf: new Buffer(arrRecevData), val : numberArray, date: new Date()});
+
+	// MD値を計算
+	var MD_Value = mdCalculator.GetMD(35.01, 33, 54, 101, 35.74, 42.52, 42.09, 1.006, 0.465, 2.428, 1104, 6.4, 9.2)[0];
+
+	console.log(`MDonSERVER=${MD_Value}`);
+
+	// データベースに保存するデータにMD値を追加
+	//numberArray.push(MD_Value);
+
+	// データベースに保存
+	var rks = new Rks({ sv: numberArray[0], pv: numberArray[1], md: MD_Value, buf: new Buffer(arrRecevData), val : numberArray, date: new Date()});
 	rks.save(function(err, doc, affected) {
 		if (err) {
 			console.log(`save error:${err}`);
@@ -249,8 +261,8 @@ var oriReplicaProtocol = new OriReplicaProtocol( function(polling) {
 	{
 		console.log("ZW data received");
 		//console.log(latestData.bufferArray[0]);
-		//tcpSocket.write(latestData.bufferArray[0]);
 		tcpSocket.write(latestDocument.buf[0]);
+
 	}
 });
 	

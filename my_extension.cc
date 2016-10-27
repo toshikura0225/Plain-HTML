@@ -1,7 +1,7 @@
 #include <nan.h>
 #include <stdio.h>
 #include "md.h"
-NAN_METHOD(hello)
+NAN_METHOD(GetMD)
 {
     // 返り値を設定
     //info.GetReturnValue().Set(Nan::New("hello, world").ToLocalChecked());
@@ -27,12 +27,12 @@ NAN_METHOD(hello)
 		pv[i] =info[i]->NumberValue();
 		//printf("%f\n", pv[i]);
 	}
-	double MD = GetMD(pv);
-	printf("MD=%f\n", MD);
+	double MD = CalcMD(pv);
+	//printf("MD=%f\n", MD);
 	
 	v8::Local<v8::Array> arr = Nan::New<v8::Array>(2);
     Nan::Set(arr, 0, Nan::New(MD));
-    Nan::Set(arr, 1, Nan::New(MD+1));
+    //Nan::Set(arr, 1, Nan::New(MD+1));
     info.GetReturnValue().Set(arr);
 	
 
@@ -41,8 +41,8 @@ NAN_METHOD(hello)
 
 NAN_MODULE_INIT(init)
 {
-    // hello 関数を外部に公開
-    NAN_EXPORT(target, hello);
+    // GetMD 関数を外部に公開
+    NAN_EXPORT(target, GetMD);
 }
 
 NODE_MODULE(my_extension, init);
