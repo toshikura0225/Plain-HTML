@@ -19,6 +19,32 @@ var js_src = Fs.readFileSync('./script.js');
 var css_src = Fs.readFileSync('./style.css');
 var flot_src = Fs.readFileSync('./jquery.flot.js');
 
+//var Iconv = require('iconv').Iconv;
+var csvParse = require('csv-parse');
+//var iconv = new Iconv('SHIFT_JIS', 'UTF-8//TRANSLIT//IGNORE');
+
+var csv_data =Fs.readFileSync('./abc.csv');
+// CSVファイルを読込み
+//csvParse(sjis.convert(csv_data).toString(), function(err, csvOutput) {
+csvParse(csv_data, function(err, csvOutput) {
+	console.log(csvOutput);
+	
+	console.log(csvOutput[0]);
+	console.log(csvOutput[0][4]);
+});
+
+for(var i=0; i<csvOutput.length; i++) {
+	
+	if(csvOutput[i][1])
+}
+
+
+
+
+
+
+
+
 // HTTPサーバーを作成＆接続待ち
 var httpServer = Http.createServer(function (req, res) {
 	
