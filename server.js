@@ -7,7 +7,8 @@ const spawn = require('child_process').spawn;
 const mongoose = require('mongoose');
 const net = require('net');
 
-const TCPIP_SERVER_HOST = '172.16.2.206';
+const TCPIP_SERVER_HOST = '192.168.159.2';
+//const TCPIP_SERVER_HOST = '172.16.2.206';
 const TCPIP_SERVER_PORT = 3001;
 
 var latestDocument;
@@ -197,7 +198,7 @@ var rksSchema = new mongoose.Schema({
 var Rks = mongoose.model('rks', rksSchema);
 
 // MD値計算
-var mdCalculator = require('./build/Release/my_extension');
+//var mdCalculator = require('./build/Release/my_extension');
 
 // ポーリング応答データをデータベースに保存する
 function saveZW(arrRecevData) {
@@ -207,9 +208,10 @@ function saveZW(arrRecevData) {
 	//console.log(numberArray.join(','));
 
 	// MD値を計算
-	var MD_Value = mdCalculator.GetMD(35.01, 33, 54, 101, 35.74, 42.52, 42.09, 1.006, 0.465, 2.428, 1104, 6.4, 9.2)[0];
+	//var MD_Value = mdCalculator.GetMD(35.01, 33, 54, 101, 35.74, 42.52, 42.09, 1.006, 0.465, 2.428, 1104, 6.4, 9.2)[0];
+	var MD_Value = 12.3456;
 
-	console.log(`MDonSERVER=${MD_Value}`);
+	//console.log(`MDonSERVER=${MD_Value}`);
 
 	// データベースに保存するデータにMD値を追加
 	//numberArray.push(MD_Value);
@@ -261,12 +263,52 @@ var oriReplicaProtocol = new OriReplicaProtocol( function(polling) {
 	{
 		console.log("ZW data received");
 		//console.log(latestData.bufferArray[0]);
-		tcpSocket.write(latestDocument.buf[0]);
+		//tcpSocket.write(latestDocument.buf[0]);
+		
+		// MD値を付加して送信
+		temporaryResponse(tcpSocket);
 
 	}
 });
 	
+function temporaryResponse(tcpSocket) {
+	
+	var md = latestDocument.md;
+	
+	
+	var before = latestDocument.buf[0].slice(0, latestDocument.buf[0].length - 2);
+		
+	var strMD = latestDocument.md.toFixed(2);
+	
+	arr = [44];
+	
+	// MD値
+	for(var i=0; i<strMD.length; i++)
+	{
+		arr.push(strMD.charCodeAt(i));
+	}
+	
+	// ETX
+	arr.push(3);
+	
+	// 
+	var indexOfSTX = arr.indexOf(2);
+	var bcc = 0;
+	for(var i=indexOfSTX+1; i<arr.length; i++) {
+		
+		bcc ^= arr[i];
+	}
 
+	// BCC
+	arr.push(bcc);
+	
+	// 送信
+	tcpSocket.write(before);
+	
+	// 送信
+	tcpSocket.write(new Buffer(arr));
+	
+}
 
 console.log('server.js running!');
 
