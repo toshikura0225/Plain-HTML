@@ -7,8 +7,8 @@ const spawn = require('child_process').spawn;
 const mongoose = require('mongoose');
 const net = require('net');
 
-//const TCPIP_SERVER_HOST = '172.16.2.85';	// Denshi46
-const TCPIP_SERVER_HOST = '172.16.2.206';	// Raspi02
+const TCPIP_SERVER_HOST = '172.16.2.85';	// Denshi46
+//const TCPIP_SERVER_HOST = '172.16.2.206';	// Raspi02
 const TCPIP_SERVER_PORT = 3001;
 
 var latestDocument;
@@ -24,7 +24,9 @@ var csvParse = require('csv-parse');
 //var iconv = new Iconv('SHIFT_JIS', 'UTF-8//TRANSLIT//IGNORE');
 
 var csv_data = Fs.readFileSync('./data_list.csv');
-var MDCalcSrcList = [];
+var MDCalcSrcList = [];	// MD値計算の要素
+var AveSrcList = [];	// MD値計算の要素の平均値
+var SdSrcList = [];		// MD値計算の要素の標準偏差
 // CSVファイルを読込み
 //csvParse(sjis.convert(csv_data).toString(), function(err, csvOutput) {
 csvParse(csv_data, function(err, csvOutput) {
@@ -37,6 +39,8 @@ csvParse(csv_data, function(err, csvOutput) {
 
 		if (csvOutput[i][1] == "1") {
 			MDCalcSrcList.push(Number(csvOutput[i][0]));
+			AveSrcList.push(Number(csvOutput[i][2]));
+			SdSrcList.push(Number(csvOutput[i][3]));
 		}
 	}
 
@@ -242,19 +246,45 @@ function saveZW(arrRecevData) {
 
 	// MD値を計算
 	var MD_Value = mdCalculator.GetMD(
-		numberArray[MDCalcSrcList[0]],
-		numberArray[MDCalcSrcList[1]],
-		numberArray[MDCalcSrcList[2]],
-		numberArray[MDCalcSrcList[3]],
-		numberArray[MDCalcSrcList[4]],
-		numberArray[MDCalcSrcList[5]],
-		numberArray[MDCalcSrcList[6]],
-		numberArray[MDCalcSrcList[7]],
-		numberArray[MDCalcSrcList[8]],
-		numberArray[MDCalcSrcList[9]],
+		numberArray[MDCalcSrcList[0]], 
+		numberArray[MDCalcSrcList[1]], 
+		numberArray[MDCalcSrcList[2]], 
+		numberArray[MDCalcSrcList[3]], 
+		numberArray[MDCalcSrcList[4]], 
+		numberArray[MDCalcSrcList[5]], 
+		numberArray[MDCalcSrcList[6]], 
+		numberArray[MDCalcSrcList[7]], 
+		numberArray[MDCalcSrcList[8]], 
+		numberArray[MDCalcSrcList[9]], 
 		numberArray[MDCalcSrcList[10]],
 		numberArray[MDCalcSrcList[11]],
-		numberArray[MDCalcSrcList[12]]
+		numberArray[MDCalcSrcList[12]],
+		AveSrcList[0],
+		AveSrcList[1],
+		AveSrcList[2],
+		AveSrcList[3],
+		AveSrcList[4],
+		AveSrcList[5],
+		AveSrcList[6],
+		AveSrcList[7],
+		AveSrcList[8],
+		AveSrcList[9],
+		AveSrcList[10],
+		AveSrcList[11],
+		AveSrcList[12],
+		SdSrcList[0],
+		SdSrcList[1],
+		SdSrcList[2],
+		SdSrcList[3],
+		SdSrcList[4],
+		SdSrcList[5],
+		SdSrcList[6],
+		SdSrcList[7],
+		SdSrcList[8],
+		SdSrcList[9],
+		SdSrcList[10],
+		SdSrcList[11],
+		SdSrcList[12]
 	)[0];
 	//var MD_Value = 12.3456;
 

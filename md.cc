@@ -1,10 +1,10 @@
 #define NUM_OF_SRC 13
 
 // 平均値
-const double AVE[] = {20.36,33.34,182.7,13.09,21.72,44.85,31.42,0.97,0.46,2.59,2958.27,7.68,26.7};
+//const double AVE[] = {20.36,33.34,182.7,13.09,21.72,44.85,31.42,0.97,0.46,2.59,2958.27,7.68,26.7};
 
 // 標準偏差
-const double SD[] = {13.15,0.93,69.71,35.89,14,4.95,8.18,0.27,0.01,0.28,788.01,1.07,15.4};
+//const double SD[] = {13.15,0.93,69.71,35.89,14,4.95,8.18,0.27,0.01,0.28,788.01,1.07,15.4};
 
 // 相関行列の逆行列
 double arrInverseMatrix[NUM_OF_SRC][NUM_OF_SRC] = {
@@ -24,7 +24,7 @@ double arrInverseMatrix[NUM_OF_SRC][NUM_OF_SRC] = {
 };
 
 // MD値を取得する
-double CalcMD(double arrSrc[])
+double CalcMD(double arrSrc[], double AVE[], double SD[])
 {
 	double arrV[NUM_OF_SRC];	// 基準化データを算出する
 	

@@ -1,6 +1,9 @@
 #include <nan.h>
 #include <stdio.h>
 #include "md.h"
+
+#define NUM_OF_SRC 13
+
 NAN_METHOD(GetMD)
 {
     // 返り値を設定
@@ -21,13 +24,32 @@ NAN_METHOD(GetMD)
 		printf("%f\n", MD);
 	}
 	*/
-	double pv[13];
-	for(int i=0; i<13; i++)
+	
+	//printf("pv is ...");
+	double pv[NUM_OF_SRC];
+	for(int i=0; i<NUM_OF_SRC; i++)
 	{
 		pv[i] =info[i]->NumberValue();
 		//printf("%f\n", pv[i]);
 	}
-	double MD = CalcMD(pv);
+	
+	//printf("ave is ...");
+	double ave[NUM_OF_SRC];
+	for(int i=NUM_OF_SRC; i<NUM_OF_SRC+NUM_OF_SRC; i++)
+	{
+		ave[i-NUM_OF_SRC] =info[i]->NumberValue();
+		//printf("%f\n", ave[i]);
+	}
+	
+	//printf("sd is ...");
+	double sd[NUM_OF_SRC];
+	for(int i=NUM_OF_SRC+NUM_OF_SRC; i<NUM_OF_SRC+NUM_OF_SRC+NUM_OF_SRC; i++)
+	{
+		sd[i-NUM_OF_SRC-NUM_OF_SRC] =info[i]->NumberValue();
+		//printf("%f\n", sd[i]);
+	}
+	
+	double MD = CalcMD(pv, ave, sd);
 	//printf("MD=%f\n", MD);
 	
 	v8::Local<v8::Array> arr = Nan::New<v8::Array>(2);
