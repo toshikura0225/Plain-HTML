@@ -7,8 +7,7 @@ const spawn = require('child_process').spawn;
 const mongoose = require('mongoose');
 const net = require('net');
 
-const TCPIP_SERVER_HOST = '192.168.159.2';
-//const TCPIP_SERVER_HOST = '172.16.2.206';
+const TCPIP_SERVER_HOST = '172.16.2.85';
 const TCPIP_SERVER_PORT = 3001;
 
 var latestDocument;
@@ -23,20 +22,27 @@ var flot_src = Fs.readFileSync('./jquery.flot.js');
 var csvParse = require('csv-parse');
 //var iconv = new Iconv('SHIFT_JIS', 'UTF-8//TRANSLIT//IGNORE');
 
-var csv_data =Fs.readFileSync('./abc.csv');
+var csv_data = Fs.readFileSync('./data_list.csv');
+var MDCalcSrcList = [];
 // CSVファイルを読込み
 //csvParse(sjis.convert(csv_data).toString(), function(err, csvOutput) {
 csvParse(csv_data, function(err, csvOutput) {
-	console.log(csvOutput);
+	//console.log(csvOutput);
 	
-	console.log(csvOutput[0]);
-	console.log(csvOutput[0][4]);
+	//console.log(csvOutput[0]);
+	//console.log(csvOutput[0][4]);
+
+	for (var i = 1; i < csvOutput.length; i++) {
+
+		if (csvOutput[i][1] == "1") {
+			MDCalcSrcList.push(Number(csvOutput[i][0]));
+		}
+	}
+
+	//console.log(MDCalcSrcList);
+
 });
 
-for(var i=0; i<csvOutput.length; i++) {
-	
-	if(csvOutput[i][1])
-}
 
 
 
@@ -224,7 +230,7 @@ var rksSchema = new mongoose.Schema({
 var Rks = mongoose.model('rks', rksSchema);
 
 // MD値計算
-//var mdCalculator = require('./build/Release/my_extension');
+var mdCalculator = require('./build/Release/my_extension');
 
 // ポーリング応答データをデータベースに保存する
 function saveZW(arrRecevData) {
@@ -234,10 +240,24 @@ function saveZW(arrRecevData) {
 	//console.log(numberArray.join(','));
 
 	// MD値を計算
-	//var MD_Value = mdCalculator.GetMD(35.01, 33, 54, 101, 35.74, 42.52, 42.09, 1.006, 0.465, 2.428, 1104, 6.4, 9.2)[0];
-	var MD_Value = 12.3456;
+	var MD_Value = mdCalculator.GetMD(
+		numberArray[MDCalcSrcList[0]],
+		numberArray[MDCalcSrcList[1]],
+		numberArray[MDCalcSrcList[2]],
+		numberArray[MDCalcSrcList[3]],
+		numberArray[MDCalcSrcList[4]],
+		numberArray[MDCalcSrcList[5]],
+		numberArray[MDCalcSrcList[6]],
+		numberArray[MDCalcSrcList[7]],
+		numberArray[MDCalcSrcList[8]],
+		numberArray[MDCalcSrcList[9]],
+		numberArray[MDCalcSrcList[10]],
+		numberArray[MDCalcSrcList[11]],
+		numberArray[MDCalcSrcList[12]]
+	)[0];
+	//var MD_Value = 12.3456;
 
-	//console.log(`MDonSERVER=${MD_Value}`);
+	console.log(`MDonSERVER=${MD_Value}`);
 
 	// データベースに保存するデータにMD値を追加
 	//numberArray.push(MD_Value);

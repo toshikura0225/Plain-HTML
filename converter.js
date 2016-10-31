@@ -34,7 +34,8 @@ Serialport.list(function (err, ports) {
 		
 		// 製品と通信するシリアルポートのインスタンスを作成する
 		// （使用可能なCOMポートが複数存在した場合、先頭(=[0])のCOMポートを使用する）
-		serial = new Serialport(ports[0].comName, serialport_propery);
+		//serial = new Serialport(ports[0].comName, serialport_propery);
+		serial = new Serialport("COM64", serialport_propery);
 		
 		// 受信時のイベントハンドラを定義
 		serial.on('data', function(arrRecvData) {

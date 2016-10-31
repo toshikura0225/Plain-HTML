@@ -1,0 +1,23 @@
+{
+  "name": "kura",
+  "version": "0.9.0",
+  "description": "for MD",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "node-gyp rebuild",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toshikura0225/Plain-HTML.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "gypfile": true,
+  "bugs": {
+    "url": "https://github.com/toshikura0225/Plain-HTML/issues"
+  },
+  "homepage": "https://github.com/toshikura0225/Plain-HTML#readme"
+}
