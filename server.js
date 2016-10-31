@@ -7,7 +7,8 @@ const spawn = require('child_process').spawn;
 const mongoose = require('mongoose');
 const net = require('net');
 
-const TCPIP_SERVER_HOST = '172.16.2.85';
+//const TCPIP_SERVER_HOST = '172.16.2.85';	// Denshi46
+const TCPIP_SERVER_HOST = '172.16.2.206';	// Raspi02
 const TCPIP_SERVER_PORT = 3001;
 
 var latestDocument;
