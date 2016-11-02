@@ -193,7 +193,8 @@ var httpServer = Http.createServer(function (req, res) {
 		res.end();
 	}
 
-}).listen(process.env.PORT || 3000);	// サーバー内環境（Herokuの場合に使用）のポートまたは3000番で待受
+//}).listen(process.env.PORT || 3000);	// サーバー内環境（Herokuの場合に使用）のポートまたは3000番で待受
+}).listen(3000);	// サーバー内環境（Herokuの場合に使用）のポートまたは3000番で待受
 
 
 // ■■■■■■■■　socket.ioサーバー関連■■■■■■■■■
