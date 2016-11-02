@@ -77,7 +77,8 @@ csvParse(com_config, { comment: '#' }, function (err, csvOutput) {
 
 
 	// ■■■■■■■■　MongoDB関連　■■■■■■■■■
-	mongoose.connect(`mongodb://${TCPIP_SERVER_HOST}:27017/rks`, function (err) {
+	//mongoose.connect(`mongodb://${TCPIP_SERVER_HOST}:27017/rks`, function (err) {
+	mongoose.connect(`mongodb://localhost:27017/rks`, function (err) {
 		if (err) {
 			console.log(`connect error ${err}`);
 		} else {
