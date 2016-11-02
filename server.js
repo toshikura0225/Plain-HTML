@@ -7,7 +7,7 @@ const spawn = require('child_process').spawn;
 const mongoose = require('mongoose');
 const net = require('net');
 
-const TCPIP_SERVER_HOST = '172.16.2.85';	// Denshi46
+var TCPIP_SERVER_HOST = '172.16.2.85';	// Denshi46
 //const TCPIP_SERVER_HOST = '172.16.2.206';	// Raspi02
 const TCPIP_SERVER_PORT = 3001;
 
@@ -23,19 +23,20 @@ var flot_src = Fs.readFileSync('./jquery.flot.js');
 var csvParse = require('csv-parse');
 //var iconv = new Iconv('SHIFT_JIS', 'UTF-8//TRANSLIT//IGNORE');
 
-var csv_data = Fs.readFileSync('./data_list.csv');
+// MD値の計算要素を取得
+var data_config = Fs.readFileSync('./data_config.csv');
 var MDCalcSrcList = [];	// MD値計算の要素
 var AveSrcList = [];	// MD値計算の要素の平均値
 var SdSrcList = [];		// MD値計算の要素の標準偏差
 // CSVファイルを読込み
 //csvParse(sjis.convert(csv_data).toString(), function(err, csvOutput) {
-csvParse(csv_data, function(err, csvOutput) {
+csvParse(data_config, { comment: '#' }, function(err, csvOutput) {
 	//console.log(csvOutput);
 	
 	//console.log(csvOutput[0]);
 	//console.log(csvOutput[0][4]);
 
-	for (var i = 1; i < csvOutput.length; i++) {
+	for (var i = 0; i < csvOutput.length; i++) {
 
 		if (csvOutput[i][1] == "1") {
 			MDCalcSrcList.push(Number(csvOutput[i][0]));
@@ -44,13 +45,96 @@ csvParse(csv_data, function(err, csvOutput) {
 		}
 	}
 
-	//console.log(MDCalcSrcList);
-
 });
 
 
+// MD値の逆行列を取得
+var md_config = Fs.readFileSync('./md_config.csv');
+var INV_MATRIX = [];
+csvParse(md_config, { comment: '#' }, function (err, csvOutput) {
+
+	for (var i = 0; i < csvOutput.length; i++) {
+
+		INV_MATRIX[i] = [];
+
+		for (var j = 0; j < csvOutput[i].length; j++) {
+
+			INV_MATRIX[i].push(Number(csvOutput[i][j]));
+		}
+	}
+	
+});
 
 
+// IPアドレス設定を取得
+var com_config = Fs.readFileSync('./com_config.csv');
+csvParse(com_config, { comment: '#' }, function (err, csvOutput) {
+	
+	TCPIP_SERVER_HOST = csvOutput[1];
+
+
+
+
+
+	// ■■■■■■■■　MongoDB関連　■■■■■■■■■
+	mongoose.connect(`mongodb://${TCPIP_SERVER_HOST}:27017/rks`, function (err) {
+		if (err) {
+			console.log(`connect error ${err}`);
+		} else {
+			console.log('connection success!');
+
+			setInterval(function () {
+				//			Rks.find({}, {}, {sort:{created: -1}, limit:1}, function(err, docs) {
+				Rks.findOne({}, {}, { sort: { date: -1 }, limit: 1 }, function (err, doc) {
+					if (!err) {
+						//console.log("num of ite => " + docs.length);
+						//for(var i=0; i<docs.length; i++) {
+						//	console.log(docs[i]);
+						//}
+						//mongoose.disconnect();
+						//process.exit();
+						//console.log(docs[0].seq);
+						//if(docs.length > 0) {
+						latestDocument = doc;
+						//console.log(docs[0].date);
+						//}
+					} else {
+						console.log("find error");
+					}
+				});
+			}, 1000);
+		}
+	});
+
+
+	net.createServer(function (sock) {
+
+		// TCPサーバーが接続しました。socketオブジェクトが自動的に割り当てられます。
+		console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
+
+		// 'data' イベントハンドラー
+		sock.on('data', function (data) {
+
+			//console.log('received on tcp: ' + data );
+			oriReplicaProtocol.addRecvArray(data);
+		});
+
+		// 'close'イベントハンドラー
+		sock.on('close', function (had_error) {
+			console.log('CLOSED. Had Error: ' + had_error);
+		});
+
+		// 'errer'イベントハンドラー
+		sock.on('error', function (err) {
+			console.log('ERROR: ' + err.stack);
+		});
+
+		tcpSocket = sock;
+
+	}).listen(TCPIP_SERVER_PORT, TCPIP_SERVER_HOST);
+
+
+});
 
 
 
@@ -193,36 +277,6 @@ function pollingZW() {
 }
 
 	
-// ■■■■■■■■　MongoDB関連　■■■■■■■■■
-mongoose.connect('mongodb://localhost:27017/rks', function(err) {
-	if (err) {
-		console.log(`connect error ${err}`);
-	} else {
-		console.log('connection success!');
-		
-		setInterval(function() {
-//			Rks.find({}, {}, {sort:{created: -1}, limit:1}, function(err, docs) {
-			Rks.findOne({}, {}, {sort:{date: -1}, limit:1}, function(err, doc) {
-				if(!err) {
-					//console.log("num of ite => " + docs.length);
-					//for(var i=0; i<docs.length; i++) {
-					//	console.log(docs[i]);
-					//}
-					//mongoose.disconnect();
-					//process.exit();
-					//console.log(docs[0].seq);
-					//if(docs.length > 0) {
-					latestDocument = doc;
-						//console.log(docs[0].date);
-					//}
-				} else {
-					console.log("find error");
-				}
-			});
-		}, 1000);
-	}
-});
-
 var rksSchema = new mongoose.Schema({
 	sv: Number,
 	pv: Number,
@@ -307,32 +361,6 @@ function saveZW(arrRecevData) {
 
 // ■■■■■■■■　TCP/IPサーバー関連関連　■■■■■■■■■
 var tcpSocket;
-net.createServer(function(sock) {
-	
-	// TCPサーバーが接続しました。socketオブジェクトが自動的に割り当てられます。
-	console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
-
-	// 'data' イベントハンドラー
-	sock.on('data', function(data) {
-		
-		//console.log('received on tcp: ' + data );
-		oriReplicaProtocol.addRecvArray(data);
-	});
-	
-	// 'close'イベントハンドラー
-	sock.on('close', function(had_error) {
-		console.log('CLOSED. Had Error: ' + had_error);
-	});
-	
-	// 'errer'イベントハンドラー
-	sock.on('error', function(err) {
-		console.log('ERROR: ' + err.stack);
-	});
-	
-	tcpSocket = sock;
-	
-}).listen(TCPIP_SERVER_PORT, TCPIP_SERVER_HOST);
-
 var oriReplicaProtocol = new OriReplicaProtocol( function(polling) {
 
 	
