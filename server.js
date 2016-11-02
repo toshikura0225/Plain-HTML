@@ -70,7 +70,7 @@ csvParse(md_config, { comment: '#' }, function (err, csvOutput) {
 var com_config = Fs.readFileSync('./com_config.csv');
 csvParse(com_config, { comment: '#' }, function (err, csvOutput) {
 	
-	TCPIP_SERVER_HOST = csvOutput[1];
+	TCPIP_SERVER_HOST = csvOutput[0][1];
 
 
 
@@ -108,6 +108,20 @@ csvParse(com_config, { comment: '#' }, function (err, csvOutput) {
 
 
 	net.createServer(function (sock) {
+
+		var oriReplicaProtocol = new OriReplicaProtocol(function (polling) {
+
+
+			if (polling.command == "ZW") {
+				console.log("ZW data received");
+				//console.log(latestData.bufferArray[0]);
+				//tcpSocket.write(latestDocument.buf[0]);
+
+				// MD値を付加して送信
+				temporaryResponse(sock);
+
+			}
+		});
 
 		// TCPサーバーが接続しました。socketオブジェクトが自動的に割り当てられます。
 		console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
@@ -361,22 +375,9 @@ function saveZW(arrRecevData) {
 
 // ■■■■■■■■　TCP/IPサーバー関連関連　■■■■■■■■■
 var tcpSocket;
-var oriReplicaProtocol = new OriReplicaProtocol( function(polling) {
 
 	
-	if(polling.command == "ZW")
-	{
-		console.log("ZW data received");
-		//console.log(latestData.bufferArray[0]);
-		//tcpSocket.write(latestDocument.buf[0]);
-		
-		// MD値を付加して送信
-		temporaryResponse(tcpSocket);
-
-	}
-});
-	
-function temporaryResponse(tcpSocket) {
+function temporaryResponse(sock) {
 	
 	var md = latestDocument.md;
 	
@@ -408,10 +409,10 @@ function temporaryResponse(tcpSocket) {
 	arr.push(bcc);
 	
 	// 送信
-	tcpSocket.write(before);
+	sock.write(before);
 	
 	// 送信
-	tcpSocket.write(new Buffer(arr));
+	sock.write(new Buffer(arr));
 	
 }
 
