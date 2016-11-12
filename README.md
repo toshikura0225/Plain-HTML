@@ -1,0 +1,1 @@
+Herokuでsocket.ioのpath-throughイベント対応
