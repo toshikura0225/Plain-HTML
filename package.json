@@ -19,5 +19,9 @@
   "homepage": "https://github.com/toshikura0225/Plain-HTML#readme",
   "dependencies": {
     "socket.io": "0.9.10"
+  },
+  "engines": {
+      "node": "5.12.0",
+      "npm": "3.8.6"
   }
 }
