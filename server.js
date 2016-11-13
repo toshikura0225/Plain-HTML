@@ -18,7 +18,7 @@ var app = http.createServer(function (req, res) {
 	// ルートまたはindex.htmlの場合
 	if (url_parts.pathname == '/' || url_parts.pathname == '/index.html') {
 		res.writeHead(200, { 'Content-Type': 'text/html' });
-		res.write(http_src);
+		res.write('OK');
 		res.end();
 	}
 
