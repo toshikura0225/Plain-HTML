@@ -6,9 +6,9 @@ const exec = require('child_process').exec;
 
 function StartTimeout(interval)
 {
-	console.log("taking picture...");
+	console.log("taking picture..." + new Date());
 	
-	setTimeout(() => {
+	setTimeout(function() {
 
 		TakePicture();
 	
@@ -17,26 +17,26 @@ function StartTimeout(interval)
 
 function TakePicture()
 {
-//	exec("raspistill -o cam1.jpg",
-	exec("ipconfig",
+	exec("raspistill -t 1 -w 420 -h 300 -o cam1.jpg",
+//	exec("ipconfig",
 	//{cwd: 'C:\\Users\\Toshihiro\\Desktop\\PersonalDevice\\PersonalDeviceApp'},
-	(error, stdout, stderr) => {
+	function(error, stdout, stderr) {
 		if (error) {
 			console.error('exec error:' + error);
 			return;
 		}
 		else
 		{
-			cli_ftp.put('abc.txt', 'r_abc.txt', function(err) {
+			cli_ftp.put('cam1.jpg', 'r_cam1.jpg', function(err) {
 				if (err) 
 				{
-				  console.log(`ftp erro : {$err}`);
+				  console.log("ftp erro : " + err);
 				}
 				else
 				{
-					console.log(`upload completed:{$err}`);
+					console.log("upload completed:" + err);
 					
-					StartTimeout(2000);
+					StartTimeout(10000);
 				}
 			});
 		}
