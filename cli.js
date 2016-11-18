@@ -1,7 +1,7 @@
 var client_ftp = require('ftp');
 // ■■■■■■■■　socket.io-client（クライアント側）　■■■■■■■■■
 const exec = require('child_process').exec;
-
+const client = require('socket.io-client');
 
 // ○○秒後に写真を撮る
 function StartTimeout(interval)
@@ -84,6 +84,23 @@ cli_ftp.connect({
 	//port:21,//portが21の場合は省略可能
 	user:"roseandryou",
 	password:"midorikuribo"
+});
+
+
+
+//var socket = client.connect('http://kuramata.herokuapp.com/');
+var socket = client.connect('http://localhost:3000/');
+
+
+
+socket.on('connect', function () {
+	
+	console.log("socket.io-client received connect event");
+	
+	socket.on('path-through', function(data) {
+		console.log();
+		console.log("socket.io received 'path-through' event and '" + data + "' message from html");
+	});
 });
 
 
