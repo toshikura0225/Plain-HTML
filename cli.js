@@ -3,45 +3,62 @@ var client_ftp = require('ftp');
 const exec = require('child_process').exec;
 
 
-
+// ○○秒後に写真を撮る
 function StartTimeout(interval)
 {
-	console.log("taking picture..." + new Date());
+	console.log("wating..." + new Date());
 	
 	setTimeout(function() {
 
-		TakePicture();
+		TakePicture_Upload();
 	
 	}, interval);
 }
 
-function TakePicture()
+// 写真を撮ってアップロードする
+function TakePicture_Upload()
 {
+	takePicture(uploadPicture);
+}
+
+// 写真を撮る
+function takePicture(takenCallback)
+{
+	console.log("taking picture..." + new Date());
 	exec("raspistill -t 1 -w 420 -h 300 -o cam1.jpg",
 //	exec("ipconfig",
 	//{cwd: 'C:\\Users\\Toshihiro\\Desktop\\PersonalDevice\\PersonalDeviceApp'},
 	function(error, stdout, stderr) {
 		if (error) {
-			console.error('exec error:' + error);
+			console.log("taking picture error! Good Bye!");
+			console.error('error:' + error);
+			console.error('stdout: ' + stdout);
+			console.error('stderr: ' + stderr);
 			return;
 		}
 		else
 		{
-			cli_ftp.put('cam1.jpg', 'r_cam1.jpg', function(err) {
-				if (err) 
-				{
-				  console.log("ftp erro : " + err);
-				}
-				else
-				{
-					console.log("upload completed:" + err);
-					
-					StartTimeout(10000);
-				}
-			});
+			console.log("taken:" + new Date());
+			takenCallback();
 		}
-		console.log('stdout: ' + stdout);
-		console.log('stderr: ' + stderr);
+	});
+}
+
+// 写真をアップロードする
+function uploadPicture()
+{
+	console.log("uploading picture..." + new Date());
+	cli_ftp.put('cam1.jpg', 'r_cam1.jpg', function(err) {
+		if (err) 
+		{
+		  console.log("upload error : " + err);
+		}
+		else
+		{
+			console.log("uploaded:" + new Date());
+			
+			StartTimeout(10000);
+		}
 	});
 }
 
