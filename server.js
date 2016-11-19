@@ -58,6 +58,34 @@ io.sockets.on('connection', function(socket) {
 		//socket.emit('path-through', data);	// 送信者に送信
 		io.sockets.emit("path-through", data)　//送信元含む全員に送信
 	});
+	
+	socket.on('start-camera', function(data) {
+		console.log();
+		console.log("socket.io received 'start-camera' event and '" + data.a + '  ' + data.b + "' message from html");
+
+		// 受信データをHTMLへ送信
+		//socket.broadcast.emit('path-through', data);	// 送信元以外に応答
+		//socket.emit('path-through', data);	// 送信者に送信
+		io.sockets.emit("start-camera", data)　//送信元含む全員に送信
+	});
+	socket.on('stop-camera', function(data) {
+		console.log();
+		console.log("socket.io received 'stop-camera' event");
+
+		// 受信データをHTMLへ送信
+		//socket.broadcast.emit('path-through', data);	// 送信元以外に応答
+		//socket.emit('path-through', data);	// 送信者に送信
+		io.sockets.emit("stop-camera", data)　//送信元含む全員に送信
+	});
+	socket.on('reload-image', function(data) {
+		console.log();
+		console.log("socket.io received 'reload-image' event");
+
+		// 受信データをHTMLへ送信
+		//socket.broadcast.emit('path-through', data);	// 送信元以外に応答
+		//socket.emit('path-through', data);	// 送信者に送信
+		io.sockets.emit("reload-image", data)　//送信元含む全員に送信
+	});
 });
 
 

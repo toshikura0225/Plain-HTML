@@ -3,12 +3,17 @@ var client_ftp = require('ftp');
 const exec = require('child_process').exec;
 const client = require('socket.io-client');
 
+var timeoutID;
+
+//var socket = client.connect('http://kuramata.herokuapp.com/');
+var socket = client.connect('http://localhost:3000/');
+
 // ○○秒後に写真を撮る
 function StartTimeout(interval)
 {
 	console.log("wating..." + new Date());
 	
-	setTimeout(function() {
+	timeoutID = setTimeout(function() {
 
 		TakePicture_Upload();
 	
@@ -56,17 +61,21 @@ function uploadPicture()
 		else
 		{
 			console.log("uploaded:" + new Date());
-			
+			socket.emit('reload-image', '');
 			StartTimeout(10000);
 		}
 	});
 }
 
+
+
+
 var cli_ftp = new client_ftp();
 
-
 cli_ftp.on('ready',function(){
-	console.log("ftp client connected.");
+	console.log("ftp client connected. ready...");
+	
+	// カメラを開始
 	StartTimeout(1000);
 });
 
@@ -76,22 +85,10 @@ cli_ftp.on('error',function(err){
 });
 
 cli_ftp.on('greeting',function(message){
+	console.log('----- greeting-----');
 	console.log(message);
+	console.log('-------------------');
 });
-
-cli_ftp.connect({
-	host:"ftp.geocities.jp",
-	//port:21,//portが21の場合は省略可能
-	user:"roseandryou",
-	password:"midorikuribo"
-});
-
-
-
-//var socket = client.connect('http://kuramata.herokuapp.com/');
-var socket = client.connect('http://localhost:3000/');
-
-
 
 socket.on('connect', function () {
 	
@@ -101,6 +98,28 @@ socket.on('connect', function () {
 		console.log();
 		console.log("socket.io received 'path-through' event and '" + data + "' message from html");
 	});
+	
+	socket.on('start-camera', function(data) {
+		console.log('start-camera:' + data.a + "  " + data.b);
+		
+		cli_ftp.connect({
+			host:"ftp.geocities.jp",
+			//port:21,//portが21の場合は省略可能
+			//user:data.a,
+			//password:data.b
+			user:"roseandryou",
+			password:"midorikuribo"
+		});
+
+	});
+	
+	socket.on('stop-camera', function(data) {
+		console.log();
+		console.log("socket.io received 'stop-camera' event");
+		clearTimeout(timeoutID);
+		cli_ftp.end();
+	});
+
 });
 
 
