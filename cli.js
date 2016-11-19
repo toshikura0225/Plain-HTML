@@ -1,3 +1,5 @@
+var intervalConst = 2000;
+
 var client_ftp = require('ftp');
 // ■■■■■■■■　socket.io-client（クライアント側）　■■■■■■■■■
 const exec = require('child_process').exec;
@@ -5,8 +7,8 @@ const client = require('socket.io-client');
 
 var timeoutID;
 
-//var socket = client.connect('http://kuramata.herokuapp.com/');
-var socket = client.connect('http://localhost:3000/');
+var socket = client.connect('http://kaden.herokuapp.com/');
+//var socket = client.connect('http://localhost:3000/');
 
 // ○○秒後に写真を撮る
 function StartTimeout(interval)
@@ -62,7 +64,7 @@ function uploadPicture()
 		{
 			console.log("uploaded:" + new Date());
 			socket.emit('reload-image', '');
-			StartTimeout(10000);
+			StartTimeout(intervalConst);
 		}
 	});
 }
