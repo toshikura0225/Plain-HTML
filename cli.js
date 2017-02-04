@@ -109,8 +109,8 @@ socket.on('connect', function () {
 			//port:21,//portが21の場合は省略可能
 			//user:data.a,
 			//password:data.b
-			user:"roseandryou",
-			password:"midorikuribo"
+			user:"****",
+			password:"*****"
 		});
 
 	});
