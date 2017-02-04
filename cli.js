@@ -71,7 +71,6 @@ function uploadPicture()
 
 
 
-
 var cli_ftp = new client_ftp();
 
 cli_ftp.on('ready',function(){
