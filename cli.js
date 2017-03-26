@@ -106,10 +106,10 @@ socket.on('connect', function () {
 		cli_ftp.connect({
 			host:"ftp.geocities.jp",
 			//port:21,//portが21の場合は省略可能
-			//user:data.a,
-			//password:data.b
-			user:"****",
-			password:"*****"
+			user:data.a,
+			password:data.b
+			//user:"****",
+			//password:"*****"
 		});
 
 	});
