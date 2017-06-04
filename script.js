@@ -23,7 +23,7 @@ function debug1() {
 	});
 	socket.on('reload-image', function (data) {
 		
-		$('#idReceived').prepend('reload-image' + + new Date() + '<br/>');		// デバッグ用に書き出し
+		//$('#idReceived').prepend('reload-image' + + new Date() + '<br/>');		// デバッグ用に書き出し
 		document.getElementById("img1").src = "http://www.cralynet.com/r_cam1.jpg?time=" + new Date();
 	});
 	socket.on('stop-camera', function (data) {
