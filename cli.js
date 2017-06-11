@@ -9,7 +9,7 @@ var timeoutID;
 
 //var socket = client.connect('http://kaden.herokuapp.com/');
 //var socket = client.connect('http://localhost:3000/');
-var socket = client.connect('http://54.238.175.192:3000/');
+var socket = client.connect('http://54.250.160.115:3000/');
 
 // ○○秒後に写真を撮る
 function StartTimeout(interval)
