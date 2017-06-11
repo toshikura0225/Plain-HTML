@@ -1,4 +1,4 @@
-var intervalConst = 2000;
+var intervalConst = 5000;
 
 var client_ftp = require('ftp');
 // ■■■■■■■■　socket.io-client（クライアント側）　■■■■■■■■■
@@ -7,8 +7,9 @@ const client = require('socket.io-client');
 
 var timeoutID;
 
-var socket = client.connect('http://kaden.herokuapp.com/');
+//var socket = client.connect('http://kaden.herokuapp.com/');
 //var socket = client.connect('http://localhost:3000/');
+var socket = client.connect('http://54.238.175.192:3000/');
 
 // ○○秒後に写真を撮る
 function StartTimeout(interval)
